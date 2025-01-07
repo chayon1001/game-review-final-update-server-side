@@ -58,27 +58,26 @@ async function run() {
         });
 
 
-        app.get('/myWatchlist/:id', async (req, res) => {
-            const { id } = req.params;
-            const query = { _id: new ObjectId(id) };
-            const review = await watchlistCollection.findOne(query);
-            res.send(review);
-        });
+       
 
 
-
-      // Get the user's watchlist by email
-      app.get('/myWatchlist', async (req, res) => {
-        const { email } = req.query;
-            if (!email) {
-                return res.status(400).send({ error: "User email is required" });
+        app.get('/watchlist', async (req, res) => {
+            try {
+                const cursor = watchlistCollection.find();
+                const result = await cursor.toArray();
+                res.send(result);
+            } catch (err) {
+                console.error('Error in /watchlist:', err);
+                res.status(500).send({ error: 'Failed to fetch watchlist' });
             }
-
-            const reviews = await gameCollection.find({ userEmail: email }).toArray();
-            res.send(reviews);
         });
- 
 
+
+
+       
+
+
+      
 
         // Add a new review
         app.post('/addReview', async (req, res) => {
@@ -93,7 +92,7 @@ async function run() {
 
 
         // Add review to watchlist
-        app.post('/watchlist', async (req, res) => {
+        app.post('/addwatchlist', async (req, res) => {
             try {
                 const { review, userEmail, userName } = req.body;
         
@@ -143,24 +142,17 @@ async function run() {
         });
 
 
-        
-
-
-        app.delete('/myWatchlist/:id', async (req, res) => {
-            try {
-                const { id } = req.params;
-                const result = await watchlistCollection.deleteOne({ _id: new ObjectId(id) });
-        
-                if (result.deletedCount === 1) {
-                    res.status(200).send({ message: 'Successfully removed from watchlist' });
-                } else {
-                    res.status(404).send({ error: 'Watchlist item not found' });
-                }
-            } catch (err) {
-                console.error('Error deleting watchlist item:', err);
-                res.status(500).send({ error: 'Internal server error' });
-            }
+        app.delete('/watchlist/:id', async (req, res) => {
+            const id = req.params.id;
+            const result = await watchlistCollection.deleteOne({ _id: new ObjectId(id) });
+            res.send(result);
         });
+
+
+        
+
+
+        
 
 
 
