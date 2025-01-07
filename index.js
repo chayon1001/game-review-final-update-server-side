@@ -58,14 +58,26 @@ async function run() {
         });
 
 
-
-      // Get the user's watchlist by email
-      app.get('/myWatchlist/:id', async (req, res) => {
-            const {id} = req.params;
+        app.get('/myWatchlist/:id', async (req, res) => {
+            const { id } = req.params;
             const query = { _id: new ObjectId(id) };
             const review = await watchlistCollection.findOne(query);
             res.send(review);
-    });
+        });
+
+
+
+      // Get the user's watchlist by email
+      app.get('/myWatchlist', async (req, res) => {
+        const { email } = req.query;
+            if (!email) {
+                return res.status(400).send({ error: "User email is required" });
+            }
+
+            const reviews = await gameCollection.find({ userEmail: email }).toArray();
+            res.send(reviews);
+        });
+ 
 
 
         // Add a new review
@@ -82,21 +94,30 @@ async function run() {
 
         // Add review to watchlist
         app.post('/watchlist', async (req, res) => {
-            const { review, userEmail, userName } = req.body;
-
-
-
-            const watchlistItem = {
-                ...review,
-                userEmail,
-                userName
-
-            };
-
-            const result = await watchlistCollection.insertOne(watchlistItem);
-            res.send(result);
+            try {
+                const { review, userEmail, userName } = req.body;
+        
+                if (!review || !userEmail || !userName) {
+                    return res.status(400).send({ error: "Invalid request data" });
+                }
+        
+                const watchlistItem = {
+                    ...review,
+                    userEmail,
+                    userName,
+                };
+        
+                const result = await watchlistCollection.insertOne(watchlistItem);
+                if (result.acknowledged) {
+                    res.status(201).send({ insertedId: result.insertedId });
+                } else {
+                    res.status(500).send({ error: "Failed to add to watchlist" });
+                }
+            } catch (err) {
+                console.error("Error in /watchlist route:", err);
+                res.status(500).send({ error: "Internal server error" });
+            }
         });
-
 
 
         app.put('/review/:id', async (req, res) => {
@@ -126,10 +147,19 @@ async function run() {
 
 
         app.delete('/myWatchlist/:id', async (req, res) => {
-            const id = req.params.id;
-            const result = await watchlistCollection.deleteOne({ _id: new ObjectId(id) });
-            res.send(result);
-           
+            try {
+                const { id } = req.params;
+                const result = await watchlistCollection.deleteOne({ _id: new ObjectId(id) });
+        
+                if (result.deletedCount === 1) {
+                    res.status(200).send({ message: 'Successfully removed from watchlist' });
+                } else {
+                    res.status(404).send({ error: 'Watchlist item not found' });
+                }
+            } catch (err) {
+                console.error('Error deleting watchlist item:', err);
+                res.status(500).send({ error: 'Internal server error' });
+            }
         });
 
 
