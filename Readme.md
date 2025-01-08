@@ -45,4 +45,11 @@ ___
 
 5. Integrate with Backend
     - Use a Node.js/Express server (or similar) to handle API routes.
+  
+##  dependencies :
+    cors ^2.8.5,
+    dotenv ^16.4.7,
+    express ^4.21.2,
+    mongodb ^6.11.0
+ 
 
