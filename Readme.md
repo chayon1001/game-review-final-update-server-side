@@ -53,7 +53,7 @@ ___
     mongodb ^6.11.0
  
 ## Getting Started
-  1.Install the dependencies: npm install
+  1. Install the dependencies: npm install
   2. Set up the environment variables.
   3. Start the development server: npm run dev.
 
