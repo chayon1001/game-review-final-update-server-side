@@ -52,4 +52,13 @@ ___
     express ^4.21.2,
     mongodb ^6.11.0
  
+## Getting Started
+  1.Install the dependencies: npm install
+  2. Set up the environment variables.
+  3. Start the development server: npm run dev.
 
+  
+#3 Contact
+For any questions or inquiries, please contact us at
+
+Email: harishankarbarman50@gmail.com.
